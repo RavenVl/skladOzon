@@ -1,0 +1,10 @@
+pyuic5 main.ui -o MainWindow.py
+
+pyinstaller --noconsole --icon=app.ico --copy-metadata pyppeteer  main.py
+--onefile — сборка в один файл, т.е. файлы .dll не пишутся.
+--windowed -при запуске приложения, будет появляться консоль.
+--noconsole — при запуске приложения, консоль появляться не будет.
+--icon=app.ico — добавляем иконку в окно.
+--paths — возможность вручную прописать путь к необходимым файлам, если pyinstaller
+
+git merge --no-ff check_community
