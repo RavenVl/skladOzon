@@ -14,10 +14,9 @@ class OzonApp(QtWidgets.QMainWindow, MainWindow.Ui_MainWindow):
         self.setupUi(self)  # Это нужно для инициализации нашего дизайна
         self.pushButton_file.clicked.connect(self.select_file)
         self.pushButton_naklad.clicked.connect(self.save_dbf)
-        self.pushButton_sklad.clicked.connect(self.select_sklad)
         self.file_name = None
         self.rez_arr = []
-        self.sklad_dir = None
+
 
     def select_sklad(self):
         file_dialog = QFileDialog()
@@ -43,21 +42,25 @@ class OzonApp(QtWidgets.QMainWindow, MainWindow.Ui_MainWindow):
             df = pd.read_excel(file_name)
             start_row = 14
             while True:
-                data = df.iloc[start_row:start_row+1, 0:19]
+                data = df.iloc[start_row:start_row+1, 0:21]
 
                 kodpr = data.iloc[0, 2]
                 try:
                     kodpr = int(kodpr)
                 except:
                     break
+
                 itogo = data.iloc[0, 13]
 
                 ret = data.iloc[0, 17]
+                itogo_ret = data.iloc[0, 20]
                 try:
                     ret = int(ret)
+                    itogo_ret = float(itogo_ret)
                 except:
                     ret = 0
-
+                    itogo_ret = 0
+                itogo-=itogo_ret
                 kol = data.iloc[0, 8]
                 try:
                     kol = int(kol)
@@ -80,11 +83,8 @@ class OzonApp(QtWidgets.QMainWindow, MainWindow.Ui_MainWindow):
             print(f"Error reading or processing Excel file: {e}")
 
     def save_dbf(self):
-        path = Path(self.sklad_dir)
         filename = "output.dbf"
-        file_name = path / filename
-
-        table = dbf.Table(str(file_name), 'kodpr N(10,0); cena N(10,2); kol N(10,0)', codepage='cp1251')
+        table = dbf.Table(filename, 'kodpr N(10,0); cena N(10,2); kol N(10,0)', codepage='cp1251')
         table.open(mode=dbf.READ_WRITE)
         # Write the rez_arr array to the DBF file
         for row in self.rez_arr:
@@ -93,7 +93,7 @@ class OzonApp(QtWidgets.QMainWindow, MainWindow.Ui_MainWindow):
         # Close the DBF file
         table.close()
 
-        QMessageBox.information(self, "Успех", f"Накладная сохранена в {file_name}")
+        QMessageBox.information(self, "Успех", f"Накладная сохранена в {filename}")
 
 def main():
     app = QtWidgets.QApplication(sys.argv)  # Новый экземпляр QApplication
